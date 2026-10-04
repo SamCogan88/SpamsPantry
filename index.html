@@ -18,7 +18,7 @@
       <span class="brand-mark" aria-hidden="true">SP</span>
       <span>Spam's Pantry</span>
     </a>
-    <span class="header-note">Cookbook · 6 recipes</span>
+    <span class="header-note">Cookbook · 12 recipes</span>
   </header>
 
   <main>
@@ -28,7 +28,7 @@
         <h1 id="heroTitle">What shall we cook?</h1>
         <p class="hero-copy">Save the recipes you love, rate the ones you try, and turn whatever is in the cupboard into dinner.</p>
       </div>
-      <div class="hero-stamp" aria-hidden="true"><span>6</span> family favourites</div>
+      <div class="hero-stamp" aria-hidden="true"><span>12</span> family favourites</div>
     </section>
 
     <section class="pantry-panel" aria-labelledby="pantryTitle">
@@ -62,7 +62,16 @@
           <input id="searchInput" type="search" placeholder="Search recipes">
         </label>
       </div>
-      <div class="filter-row" id="filterRow" aria-label="Filter by cooking style"></div>
+      <div class="filter-groups">
+        <div class="filter-group">
+          <span class="filter-label">Meal</span>
+          <div class="filter-row" id="mealFilterRow" aria-label="Filter by meal"></div>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Method</span>
+          <div class="filter-row" id="typeFilterRow" aria-label="Filter by cooking method"></div>
+        </div>
+      </div>
       <div class="recipe-grid" id="recipeGrid"></div>
       <div class="empty-state" id="emptyState" hidden>
         <span>🍅</span><h3>No recipes found</h3><p>Try another search, or add the recipe you're craving.</p>
