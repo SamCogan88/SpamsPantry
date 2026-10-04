@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe5">
+  <meta name="description" content="Spam's Pantry — your family's recipe book and ingredient matcher.">
+  <title>Spam's Pantry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="enhancements.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Spam's Pantry home">
+      <span class="brand-mark" aria-hidden="true">SP</span>
+      <span>Spam's Pantry</span>
+    </a>
+    <span class="header-note">Cookbook · 5 recipes</span>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="heroTitle">
+      <div>
+        <p class="eyebrow">OUR FAMILY COOKBOOK</p>
+        <h1 id="heroTitle">What shall we cook?</h1>
+        <p class="hero-copy">Save the recipes you love, rate the ones you try, and turn whatever is in the cupboard into dinner.</p>
+      </div>
+      <div class="hero-stamp" aria-hidden="true"><span>5</span> family favourites</div>
+    </section>
+
+    <section class="pantry-panel" aria-labelledby="pantryTitle">
+      <div class="pantry-heading">
+        <div class="pantry-icon" aria-hidden="true">✦</div>
+        <div>
+          <p class="eyebrow">PANTRY MATCH</p>
+          <h2 id="pantryTitle">What's in the kitchen?</h2>
+        </div>
+      </div>
+      <p class="pantry-help">Add ingredients you have. We'll find the closest matches in your recipe book.</p>
+      <form class="ingredient-entry" id="ingredientForm">
+        <label class="sr-only" for="ingredientInput">Add an ingredient</label>
+        <input id="ingredientInput" list="ingredientSuggestions" autocomplete="off" placeholder="Try chicken, tomatoes, rice…">
+        <datalist id="ingredientSuggestions"></datalist>
+        <button type="submit">Add</button>
+      </form>
+      <div class="ingredient-chips" id="ingredientChips" aria-live="polite"></div>
+      <div class="match-summary" id="matchSummary" hidden></div>
+    </section>
+
+    <section class="library" aria-labelledby="libraryTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">THE RECIPE BOOK</p>
+          <h2 id="libraryTitle">Family favourites</h2>
+        </div>
+        <label class="search-box">
+          <span aria-hidden="true">⌕</span>
+          <span class="sr-only">Search recipes</span>
+          <input id="searchInput" type="search" placeholder="Search recipes">
+        </label>
+      </div>
+      <div class="filter-row" id="filterRow" aria-label="Filter by cooking style"></div>
+      <div class="recipe-grid" id="recipeGrid"></div>
+      <div class="empty-state" id="emptyState" hidden>
+        <span>🍅</span><h3>No recipes found</h3><p>Try another search, or add the recipe you're craving.</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="recipeDialog" class="recipe-dialog">
+    <div id="recipeDetail"></div>
+  </dialog>
+
+  <template id="starsTemplate"><div class="stars" role="group" aria-label="Taste rating"></div></template>
+  <script src="app.js"></script>
+</body>
+</html>
