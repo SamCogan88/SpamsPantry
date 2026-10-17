@@ -34,6 +34,19 @@ export const seedRecipes = [
 ];
 
 const extraTags = {
+  'sausage-casserole': ['Freezer friendly'],
+  'beef-chilli': ['Freezer friendly'],
+  'chickpea-stew': ['Vegetarian','Vegan','Freezer friendly'],
+  'tuna-sweetcorn-burgers': ['Lunch','Quick'],
+  'pork-chilli-lettuce-cups': ['Lunch'],
+  'thai-chicken-mushroom-broth': ['Quick'],
+  'mediterranean-sweet-potatoes': ['Vegetarian','Vegan','Quick'],
+  'roasted-garlic-soup': ['Vegetarian'],
+  'creamy-red-lentil-curry': ['Vegetarian','Vegan','Freezer friendly'],
+  'creamy-broccoli-pasta': ['Vegetarian'],
+  'pasta-e-ceci': ['Vegetarian','Freezer friendly'],
+  'butternut-squash-pasta': ['Vegetarian'],
+  'spaghetti-aglio-e-olio': ['Vegetarian','Vegan','Quick'],
   'batch-shepherds-pie': ['Dinner','Freezer friendly'],
   'batch-lunch-burritos': ['Lunch','Freezer friendly'],
   'batch-spaghetti-bolognese': ['Dinner','Freezer friendly'],
