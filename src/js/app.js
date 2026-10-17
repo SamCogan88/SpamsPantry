@@ -11,6 +11,9 @@ const chips = document.querySelector('#ingredientChips');
 const summary = document.querySelector('#matchSummary');
 const detailDialog = document.querySelector('#recipeDialog');
 
+document.querySelector('#recipeCountHeader').textContent=`Cookbook · ${recipes.length} recipes`;
+document.querySelector('#recipeCountStamp').textContent=recipes.length;
+
 const normalize = text => text.toLowerCase().replace(/[^a-z\s]/g,' ').replace(/\b(g|kg|ml|l|tbsp|tsp|tin|half|the|a|an|of|and|to|in|with|dry|chopped|sliced|diced|drained|lean|hot)\b/g,' ').replace(/\s+/g,' ').trim();
 const ingredientName = line => normalize(line).split(' ').filter(w => w.length > 2).slice(-3).join(' ');
 const persistRatings = () => localStorage.setItem('spams-pantry-ratings', JSON.stringify(Object.fromEntries(recipes.map(r => [r.id, r.taste]))));
