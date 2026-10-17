@@ -3,8 +3,7 @@ import { seedRecipes } from './recipes.js';
 const savedRatings = JSON.parse(localStorage.getItem('spams-pantry-ratings') || '{}');
 const recipes = seedRecipes.map(recipe => ({...recipe, taste: Number(savedRatings[recipe.id]) || recipe.taste}));
 let pantry = [];
-let activeType = 'All';
-let activeMeal = 'All';
+const activeTags = new Set();
 let query = '';
 const grid = document.querySelector('#recipeGrid');
 const chips = document.querySelector('#ingredientChips');
@@ -17,8 +16,7 @@ document.querySelector('#recipeCountStamp').textContent=recipes.length;
 const normalize = text => text.toLowerCase().replace(/[^a-z\s]/g,' ').replace(/\b(g|kg|ml|l|tbsp|tsp|tin|half|the|a|an|of|and|to|in|with|dry|chopped|sliced|diced|drained|lean|hot)\b/g,' ').replace(/\s+/g,' ').trim();
 const ingredientName = line => normalize(line).split(' ').filter(w => w.length > 2).slice(-3).join(' ');
 const persistRatings = () => localStorage.setItem('spams-pantry-ratings', JSON.stringify(Object.fromEntries(recipes.map(r => [r.id, r.taste]))));
-const types = () => ['All', ...new Set(recipes.map(r => r.type))];
-const meals = () => ['All', ...new Set(recipes.map(r => r.meal))];
+const tags = () => [...new Set(recipes.flatMap(r => r.tags))].sort((a,b)=>a.localeCompare(b));
 
 function matchFor(recipe){
   if(!pantry.length) return null;
@@ -34,20 +32,20 @@ function starButtons(recipe, compact=false){
 }
 
 function renderFilters(){
-  const renderRow=(selector,values,active,onSelect)=>{const row=document.querySelector(selector);row.innerHTML='';values.forEach(value=>{const b=document.createElement('button');b.className=`filter-chip ${value===active?'active':''}`;b.textContent=value;b.type='button';b.setAttribute('aria-pressed',String(value===active));b.onclick=()=>{onSelect(value);render()};row.append(b)})};
-  renderRow('#mealFilterRow',meals(),activeMeal,value=>activeMeal=value);
-  renderRow('#typeFilterRow',types(),activeType,value=>activeType=value);
+  const row=document.querySelector('#tagFilterRow');row.innerHTML='';
+  tags().forEach(tag=>{const selected=activeTags.has(tag);const b=document.createElement('button');b.className=`filter-chip ${selected?'active':''}`;b.textContent=tag;b.type='button';b.setAttribute('aria-pressed',String(selected));b.onclick=()=>{selected?activeTags.delete(tag):activeTags.add(tag);render()};row.append(b)});
+  if(activeTags.size){const clear=document.createElement('button');clear.className='filter-clear';clear.type='button';clear.textContent='Clear labels';clear.onclick=()=>{activeTags.clear();render()};row.append(clear)}
 }
 
 function render(){
   renderFilters(); grid.innerHTML='';
-  let visible=recipes.filter(r=>(activeMeal==='All'||r.meal===activeMeal)&&(activeType==='All'||r.type===activeType)&&(`${r.title} ${r.description} ${r.ingredients.join(' ')}`.toLowerCase().includes(query)));
+  let visible=recipes.filter(r=>[...activeTags].every(tag=>r.tags.includes(tag))&&(`${r.title} ${r.description} ${r.ingredients.join(' ')}`.toLowerCase().includes(query)));
   if(pantry.length) visible.sort((a,b)=>(matchFor(b)?.count||0)-(matchFor(a)?.count||0));
   document.querySelector('#emptyState').hidden=visible.length>0;
   visible.forEach(recipe=>{
     const match=matchFor(recipe); const card=document.createElement('article'); card.className='recipe-card';
     const image=recipe.image?`<img class="card-image" src="${recipe.image}" alt="${recipe.title}">`:`<div class="custom-placeholder" aria-hidden="true">${recipe.title.charAt(0)}</div>`;
-    card.innerHTML=`<div class="card-image-wrap">${image}<span class="type-pill">${recipe.meal} · ${recipe.type}</span>${match&&match.count?`<span class="match-pill">${match.count} match${match.count>1?'es':''}</span>`:''}</div><div class="card-body"><h3>${recipe.title}</h3><p class="card-description">${recipe.description||'A family recipe waiting to be cooked.'}</p><div class="card-meta"><span>◷ ${recipe.time}</span><span>♙ Serves ${recipe.serves}</span></div><div class="card-footer"><div class="rating-slot"></div><span class="expense" title="Expense">${'£'.repeat(recipe.expense)}<span class="off">${'£'.repeat(3-recipe.expense)}</span></span><button class="open-recipe" type="button">View →</button></div></div>`;
+    card.innerHTML=`<div class="card-image-wrap">${image}<span class="type-pill">${recipe.tags.slice(0,3).join(' · ')}</span>${match&&match.count?`<span class="match-pill">${match.count} match${match.count>1?'es':''}</span>`:''}</div><div class="card-body"><h3>${recipe.title}</h3><p class="card-description">${recipe.description||'A family recipe waiting to be cooked.'}</p><div class="card-meta"><span>◷ ${recipe.time}</span><span>♙ Serves ${recipe.serves}</span></div><div class="card-footer"><div class="rating-slot"></div><span class="expense" title="Expense">${'£'.repeat(recipe.expense)}<span class="off">${'£'.repeat(3-recipe.expense)}</span></span><button class="open-recipe" type="button">View →</button></div></div>`;
     card.querySelector('.rating-slot').replaceWith(starButtons(recipe,true));
     card.querySelector('.open-recipe').onclick=()=>openRecipe(recipe.id);
     card.querySelector('.card-image-wrap').onclick=()=>openRecipe(recipe.id);
@@ -85,7 +83,7 @@ function renderScaledIngredients(recipe,servings){
 function openRecipe(id){
   const recipe=recipes.find(r=>r.id===id);if(!recipe)return;const match=matchFor(recipe);const el=document.querySelector('#recipeDetail');
   const servingOptions=Array.from({length:8},(_,i)=>i+1).map(n=>`<option value="${n}" ${n===recipe.serves?'selected':''}>${n} ${n===1?'person':'people'}</option>`).join('');
-  el.innerHTML=`${recipe.image?`<img class="detail-image" src="${recipe.image}" alt="${recipe.title}">`:''}<div class="detail-content"><div class="detail-top"><div><p class="eyebrow">${recipe.meal.toUpperCase()} · ${recipe.type.toUpperCase()}</p><h2>${recipe.title}</h2></div><button class="icon-button" type="button" data-close-detail aria-label="Close">×</button></div><p class="detail-lead">${recipe.description||''}</p>${recipe.source?`<a class="source-link" href="${recipe.source}" target="_blank" rel="noopener noreferrer">Inspired by ${recipe.sourceLabel} ↗</a>`:''}<div class="detail-meta"><span>◷ ${recipe.time}</span><label class="serving-control">Scale for <select id="servingSelect" aria-label="Number of people">${servingOptions}</select></label><span>${'£'.repeat(recipe.expense)} expense</span>${match?`<span>${match.count} pantry matches</span>`:''}</div><div class="rating-line"><strong>Taste</strong><div class="detail-rating"></div></div><div class="detail-columns"><section><h3>Ingredients</h3><p class="scaled-note" id="scaledNote"></p><ul class="ingredients-list" id="scaledIngredients"></ul></section><section><h3>Method</h3><ol class="steps-list">${recipe.steps.map(s=>`<li>${s}</li>`).join('')}</ol></section></div></div>`;
+  el.innerHTML=`${recipe.image?`<img class="detail-image" src="${recipe.image}" alt="${recipe.title}">`:''}<div class="detail-content"><div class="detail-top"><div><p class="eyebrow">${recipe.tags.map(tag=>tag.toUpperCase()).join(' · ')}</p><h2>${recipe.title}</h2></div><button class="icon-button" type="button" data-close-detail aria-label="Close">×</button></div><p class="detail-lead">${recipe.description||''}</p>${recipe.source?`<a class="source-link" href="${recipe.source}" target="_blank" rel="noopener noreferrer">Inspired by ${recipe.sourceLabel} ↗</a>`:''}<div class="detail-meta"><span>◷ ${recipe.time}</span><label class="serving-control">Scale for <select id="servingSelect" aria-label="Number of people">${servingOptions}</select></label><span>${'£'.repeat(recipe.expense)} expense</span>${match?`<span>${match.count} pantry matches</span>`:''}</div><div class="rating-line"><strong>Taste</strong><div class="detail-rating"></div></div><div class="detail-columns"><section><h3>Ingredients</h3><p class="scaled-note" id="scaledNote"></p><ul class="ingredients-list" id="scaledIngredients"></ul></section><section><h3>Method</h3><ol class="steps-list">${recipe.steps.map(s=>`<li>${s}</li>`).join('')}</ol></section></div></div>`;
   renderScaledIngredients(recipe,recipe.serves);
   el.querySelector('#servingSelect').onchange=e=>renderScaledIngredients(recipe,Number(e.target.value));
   el.querySelector('.detail-rating').replaceWith(starButtons(recipe));el.querySelector('[data-close-detail]').onclick=()=>detailDialog.close();
